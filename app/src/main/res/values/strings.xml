@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">UnivalleBiblioteca</string>
+    <!--Página inicial de busqueda-->
+    <string name="titulo_inicio">Biblioteca Universidad del Valle</string>
+    <string name="s_busqueda">Busqueda</string>
+    <string name="element_text">Elemento 1</string>
+    <!--Fin página inicial de busqueda-->
+</resources>
