@@ -63,6 +63,13 @@ public class ListarBusqueda extends Activity {
     TextView tvLibroGenerado;
     TextView tvCodigoEstudianteGenerado;
     TextView tvCodigoTiquete;
+    Button btnGenerarSolicitud;
+    Button btnCancelarSolicitud;
+    TextView etLibroSolicitud;
+    TextView etNombreSolicitante;
+    TextView etCodigoEstudianteSolicitud;
+    TextView etCorreoEstudianteSolicitud;
+    TextView etMensajeSolicitud;
 
 
     @Override
@@ -225,15 +232,10 @@ public class ListarBusqueda extends Activity {
                 Intent intent;
 
                 if(items[which].toString().equals("Generar tiquete")){
-                    /*intent = new Intent(Visita.this,CerrarVisita.class);
-                    intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
-                    startActivity(intent);*/
                     showGenerarTiquete(disponibilidad);
                 }else
                 if(items[which].toString().equals("Solicitar")){
-                    /*intent = new Intent(Visita.this,CancelarVisita.class);
-                    intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
-                    startActivity(intent);*/
+                    showGenerarSolicitud(disponibilidad);
                 }
 
             }
@@ -241,6 +243,82 @@ public class ListarBusqueda extends Activity {
 
         AlertDialog alert = builder.create();
         alert.show();
+
+    }
+
+    public void showGenerarSolicitud(final ItemLibroDisponibilidad disponibilidad){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.datos_generar_solicitud);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.setTitle("Generar solicitud");
+
+        btnGenerarSolicitud = (Button) dialog.findViewById(R.id.btnGenerarSolicitud);
+        btnCancelarSolicitud = (Button) dialog.findViewById(R.id.btnCancelarSolicitud);
+        etLibroSolicitud = (EditText) dialog.findViewById(R.id.etLibroSolicitud);
+        etNombreSolicitante = (EditText) dialog.findViewById(R.id.etNombreSolicitante);
+        etCodigoEstudianteSolicitud = (EditText) dialog.findViewById(R.id.etCodigoEstudianteSolicitud);
+        etCorreoEstudianteSolicitud = (EditText) dialog.findViewById(R.id.etCorreoEstudianteSolicitud);
+        etMensajeSolicitud = (EditText) dialog.findViewById(R.id.etMensajeSolicitud);
+        etLibroSolicitud.setText(disponibilidad.getLibro_titulo());
+        etLibroSolicitud.setEnabled(true);
+
+        btnGenerarSolicitud.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grabarSolicitud(disponibilidad);
+                adapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+
+        btnCancelarSolicitud.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    public void grabarSolicitud(final ItemLibroDisponibilidad disponibilidad){
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+
+        progressDialog.setMessage("Generando tiquete");
+        progressDialog.show();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = Config.getUrl("Controller/GrabarSolicitudController.php");
+
+        RequestParams parametros = new RequestParams();
+        parametros.put("itelibdis_codigo",disponibilidad.getItelibdis_codigo());
+        parametros.put("nombrelibro",etLibroSolicitud.getText());
+        parametros.put("correoestudiante",etCorreoEstudianteSolicitud.getText());
+        parametros.put("codigoestudiante",etCodigoEstudianteSolicitud.getText());
+        parametros.put("mensajeestudiante",etMensajeSolicitud.getText());
+        parametros.put("nombreestudiante",etNombreSolicitante);
+
+        client.post(url, parametros, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                if (statusCode == 200) {
+                    String respuesta = new String(responseBody);
+                    Toast.makeText(getApplicationContext(), ""+respuesta, Toast
+                            .LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+
+        });
 
     }
 
