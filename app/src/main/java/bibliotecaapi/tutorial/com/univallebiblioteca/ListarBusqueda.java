@@ -60,6 +60,9 @@ public class ListarBusqueda extends Activity {
     EditText etObservacion;
     Button btnCancelarTiquete;
     Button btnCerrar;
+    TextView tvLibroGenerado;
+    TextView tvCodigoEstudianteGenerado;
+    TextView tvCodigoTiquete;
 
 
     @Override
@@ -324,8 +327,15 @@ public class ListarBusqueda extends Activity {
         dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
         dialog.setTitle("Resultado tiquete");
 
-
         btnCerrar = (Button) dialog.findViewById(R.id.btnCerrar);
+        tvCodigoEstudianteGenerado = (TextView) dialog.findViewById(R.id.tvCodigoEstudianteGenerado);
+        tvLibroGenerado = (TextView) dialog.findViewById(R.id.tvLibroGenerado);
+        tvCodigoTiquete = (TextView) dialog.findViewById(R.id.tvCodigoTiquete);
+
+        tvCodigoEstudianteGenerado.setText(etCodigoEstudiante.getText());
+        tvLibroGenerado.setText(disponibilidad.getLibro_titulo());
+        tvCodigoTiquete.setText(responseBody);
+
 
         btnCerrar.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -54,12 +54,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/tvCodigoTiquete"
             android:layout_toRightOf="@+id/imagenLista"
-            android:textSize="30sp"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:text="codigo tiquete"
             android:textColor="@color/blanco"></TextView>
-
 
     </RelativeLayout>
 
