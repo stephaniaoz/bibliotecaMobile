@@ -7,15 +7,18 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +52,7 @@ public class ListarBusqueda extends Activity {
     TextView libroResumen;
     Integer pocisionlibro;
     CharSequence[] items = new CharSequence[0];
-
+    DisponibilidadAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +162,7 @@ public class ListarBusqueda extends Activity {
         listaDisponibilidad = (ListView) dialog.findViewById(R.id.listaDisponibilidad);
         librotitulodisponibilidad = (TextView) dialog.findViewById(R.id.tvLibroTituloDis);
         librotitulodisponibilidad.setText(listaObjLibrosJson.get(pocisionlibro).getLibro_titulo());
+
         this.setOnClickListenerListViewDisponibilidad();
 
         cargaDatosDisponibilidad(libro_codigo);
@@ -181,12 +185,13 @@ public class ListarBusqueda extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ItemLibroDisponibilidad disponibilidad = listaObjDisponibilidadJson.get(position);
                 showDialogOpcionListaDisponibilidad(disponibilidad);
+                adapter.notifyDataSetChanged();
             }
         });
 
     }
 
-    public void showDialogOpcionListaDisponibilidad(ItemLibroDisponibilidad disponibilidad){
+    public void showDialogOpcionListaDisponibilidad(final ItemLibroDisponibilidad disponibilidad){
 
         String estadoTitle = "Opciones";
         if(disponibilidad.getEstado_nombre().equals("DISPONIBLE")){
@@ -207,12 +212,14 @@ public class ListarBusqueda extends Activity {
 
                 Intent intent;
 
-                if(items[which].toString().equals("Cerrar visita")){
+                if(items[which].toString().equals("Generar tiquete")){
                     /*intent = new Intent(Visita.this,CerrarVisita.class);
                     intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
                     startActivity(intent);*/
+                    grabarTiquete(disponibilidad);
+                    adapter.notifyDataSetChanged();
                 }else
-                if(items[which].toString().equals("Cancelar visita")){
+                if(items[which].toString().equals("Solicitar")){
                     /*intent = new Intent(Visita.this,CancelarVisita.class);
                     intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
                     startActivity(intent);*/
@@ -223,6 +230,52 @@ public class ListarBusqueda extends Activity {
 
         AlertDialog alert = builder.create();
         alert.show();
+
+    }
+
+    public void showGenerarTiquete(ItemLibroDisponibilidad disponibilidad){
+
+
+
+    }
+
+    public void grabarTiquete(final ItemLibroDisponibilidad disponibilidad){
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+
+        progressDialog.setMessage("Generando tiquete");
+        progressDialog.show();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = Config.getUrl("Controller/GrabarTiqueteController.php");
+
+        RequestParams parametros = new RequestParams();
+        parametros.put("itelibdis_codigo",disponibilidad.getItelibdis_codigo());
+        parametros.put("correoestudiante","correo@univalle.edu.co");
+        parametros.put("codigoestudiante","201463778-2711");
+        parametros.put("libro_codigo",disponibilidad.getLibro_codigo());
+
+        client.post(url, parametros, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                if (statusCode == 200) {
+                    String respuesta = new String(responseBody);
+                    Toast.makeText(getApplicationContext(), "okk: "+respuesta, Toast
+                            .LENGTH_LONG).show();
+                    disponibilidad.setEstado_codigo("8");
+                    disponibilidad.setEstado_codigo("RESERVADO");
+                    progressDialog.dismiss();
+                    adapter.notifyDataSetChanged();
+                    //obtDatosJSONdisponiblidad(new String(responseBody));
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+
+        });
 
     }
 
@@ -274,9 +327,9 @@ public class ListarBusqueda extends Activity {
 
             }
 
-            DisponibilidadAdapter adapter = new DisponibilidadAdapter(this, listaObjDisponibilidadJson);
+            adapter = new DisponibilidadAdapter(this, listaObjDisponibilidadJson);
             listaDisponibilidad.setAdapter(adapter);
-
+            adapter.notifyDataSetChanged();
             /*ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout
                     .simple_expandable_list_item_1, listado);
             listaDisponibilidad.setAdapter(adapter);*/
