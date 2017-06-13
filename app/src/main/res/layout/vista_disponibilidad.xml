@@ -31,17 +31,17 @@
             android:id="@+id/tvLibroTitulo"
             android:textColor="@color/colorNegro"/>
 
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Atrás"/>
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/listaLibros"
+            android:id="@+id/listaDisponibilidad"
             android:layout_marginLeft="3px"/>
-
-        <Button
-            android:id="@+id/btnCancelar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cancelar"/>
 
     </LinearLayout>
 

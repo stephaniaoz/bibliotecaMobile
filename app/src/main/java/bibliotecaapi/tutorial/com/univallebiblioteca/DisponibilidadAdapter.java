@@ -1,14 +1,12 @@
 package bibliotecaapi.tutorial.com.univallebiblioteca;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.github.snowdream.android.widget.SmartImageView;
 
 import java.util.ArrayList;
 
@@ -18,30 +16,32 @@ import java.util.ArrayList;
 
 public class DisponibilidadAdapter extends BaseAdapter {
 
-    Context context;
-    LayoutInflater layoutInflater;
-    SmartImageView smartImageView;
-    TextView tvLibroTitulo, tvLibroPublicacion, tvNombreLibro;
-    int tamArreglo;
-    ArrayList<Libro> objLibro = new ArrayList<Libro>();
+    protected Activity activity;
+    protected ArrayList<ItemLibroDisponibilidad> items;
 
-    public DisponibilidadAdapter(Context contextAplicacion, int tamanioArreglo,
-                         ArrayList<Libro> obLibro) {
+    public DisponibilidadAdapter(Activity activity, ArrayList<ItemLibroDisponibilidad> items){
+        this.activity = activity;
+        this.items = items;
+    }
 
-        this.context = contextAplicacion;
-        this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.tamArreglo = tamanioArreglo;
-        this.objLibro = obLibro;
+    public void clear() {
+        items.clear();
+    }
+
+    public void addAll(ArrayList<ItemLibroDisponibilidad> disponiblilidad) {
+        for (int i = 0; i < disponiblilidad.size(); i++) {
+            items.add(disponiblilidad.get(i));
+        }
     }
 
     @Override
     public int getCount() {
-        return tamArreglo;
+        return items.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return items.get(position);
     }
 
     @Override
@@ -52,23 +52,30 @@ public class DisponibilidadAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        ViewGroup viewGroup = (ViewGroup) layoutInflater.inflate(R.layout.row_listar_busqueda,null);
+        View v = convertView;
 
-        smartImageView = (SmartImageView) viewGroup.findViewById(R.id.imagenLista);
-        tvLibroTitulo = (TextView) viewGroup.findViewById(R.id.libroTitulo);
-        tvLibroPublicacion = (TextView) viewGroup.findViewById(R.id.libroPublicacion);
-        tvNombreLibro = (TextView) viewGroup.findViewById(R.id.tvNombreLibro);
+        if (convertView == null) {
+            LayoutInflater inf = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = inf.inflate(R.layout.row_listar_disponibilidad, null);
+        }
 
-        String urlFinal = Config.getUrl("View/imageBooks/"+objLibro.get(position).getLibro_imagen());
-        Rect rect = new Rect(smartImageView.getLeft(), smartImageView.getTop(), smartImageView
-                .getRight(), smartImageView.getBottom());
+        ItemLibroDisponibilidad dir = items.get(position);
 
-        smartImageView.setImageUrl(urlFinal, rect);
-        tvNombreLibro.setText(objLibro.get(position).getLibro_titulo());
-        tvLibroTitulo.setText(objLibro.get(position).getLibro_publicacioncompleta());
-        tvLibroPublicacion.setText(objLibro.get(position).getLibro_descripcionfisica());
+        TextView codBarras = (TextView) v.findViewById(R.id.tvCodBarras);
+        codBarras.setText(dir.getItelibdis_codigobarras());
+        TextView localizacion = (TextView) v.findViewById(R.id.tvLocalizacion);
+        localizacion.setText(dir.getLocalizacion_localizacion());
+        TextView estante = (TextView) v.findViewById(R.id.tvEstante);
+        estante.setText(dir.getEstante_nombre());
+        TextView signatura = (TextView) v.findViewById(R.id.tvSignatura);
+        signatura.setText(dir.getItelibdis_signaturatopografica());
+        TextView estado = (TextView) v.findViewById(R.id.tvEstado);
+        estado.setText(dir.getEstado_nombre());
+        TextView categoria = (TextView) v.findViewById(R.id.tvCategoria);
+        categoria.setText(dir.getCategoria_nombre());
 
-        return viewGroup;
+        return v;
+
     }
 
 }

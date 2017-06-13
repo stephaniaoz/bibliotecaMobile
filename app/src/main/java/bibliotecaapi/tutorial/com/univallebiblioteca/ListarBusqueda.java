@@ -31,11 +31,14 @@ public class ListarBusqueda extends Activity {
 
     private ListView listaLibros;
     ArrayList<Libro> listaObjLibrosJson = new ArrayList<Libro>();
+    ArrayList<ItemLibroDisponibilidad> listaObjDisponibilidadJson = new ArrayList<ItemLibroDisponibilidad>();
     JSONArray jsonArray;
+    JSONArray jsonArrayDisponibilidad;
     Intent intent;
     Button btnCancelar;
     Button btnDisponibilidad;
     TextView tvLibroTitulo;
+    ListView listaDisponibilidad;
 
     JSONObject jsonObject = new JSONObject();
     TextView libroTitulo;
@@ -94,6 +97,7 @@ public class ListarBusqueda extends Activity {
         libroPublicacion = (TextView) dialog.findViewById(R.id.tvLibroPublicacion);
         descripcionFisica = (TextView) dialog.findViewById(R.id.tvDescripcionFisica);
         libroResumen = (TextView) dialog.findViewById(R.id.tvLibroResumen);
+        String libro_codigo = "";
 
         try {
             String dataJsonObject = jsonArray.get(position).toString();
@@ -105,6 +109,7 @@ public class ListarBusqueda extends Activity {
                     libroPublicacion.setText(jsonObject.getString("libro_publicacioncompleta"));
                     descripcionFisica.setText(jsonObject.getString("libro_descripcionfisica"));
                     libroResumen.setText(jsonObject.getString("libro_resumen"));
+                    libro_codigo = jsonObject.getString("libro_codigo");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -117,10 +122,11 @@ public class ListarBusqueda extends Activity {
         btnDisponibilidad = (Button) dialog.findViewById(R.id.btnDisponibilidad);
         btnCancelar = (Button) dialog.findViewById(R.id.btnCancelar);
 
+        final String finalLibro_codigo = libro_codigo;
         btnDisponibilidad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDisponibilidad();
+                showDisponibilidad(finalLibro_codigo);
             }
         });
 
@@ -136,15 +142,20 @@ public class ListarBusqueda extends Activity {
 
     }
 
-    public void showDisponibilidad(){
+    public void showDisponibilidad(final String libro_codigo){
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.vista_disponibilidad);
         dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
         dialog.setTitle("Disponibilidad");
 
-        tvLibroTitulo = (TextView) dialog.findViewById(R.id.tvLibroTitulo);
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, valores);
+        //listaDisponibilidad.setAdapter(adapter);
+
         btnCancelar = (Button) dialog.findViewById(R.id.btnCancelar);
+        listaDisponibilidad = (ListView) dialog.findViewById(R.id.listaDisponibilidad);
+
+        cargaDatosDisponibilidad(libro_codigo);
 
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +167,66 @@ public class ListarBusqueda extends Activity {
         dialog.show();
 
     };
+
+    public void cargaDatosDisponibilidad(String libroCodigo){
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+
+        progressDialog.setMessage("Cargando disponibilidad");
+        progressDialog.show();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = Config.getUrl("Controller/ListarBusquedaDisponiblidadController.php");
+        String parametros = "?librocodigo="+libroCodigo;
+
+        client.post(url+parametros, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                if (statusCode == 200) {
+                    progressDialog.dismiss();
+                    obtDatosJSONdisponiblidad(new String(responseBody));
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+
+        });
+
+    }
+
+    public void obtDatosJSONdisponiblidad(String response){
+        listaObjDisponibilidadJson.clear();
+
+        ArrayList<String> listado = new ArrayList<>();
+
+        try {
+            jsonArrayDisponibilidad = new JSONArray(response);
+            String texto;
+
+            listaObjDisponibilidadJson = new ItemLibroDisponibilidad().jsonArrayToArrayListDisponibilidad(jsonArrayDisponibilidad);
+
+            for (int i=0; i<jsonArrayDisponibilidad.length(); i++){
+                System.out.println("Titulo::"+listaObjDisponibilidadJson.get(i).getLibro_codigo());
+                System.out.println("size::"+listaObjDisponibilidadJson.size());
+
+                listado.add(listaObjDisponibilidadJson.get(i).getItelibdis_signaturatopografica());
+
+            }
+
+            DisponibilidadAdapter adapter = new DisponibilidadAdapter(this, listaObjDisponibilidadJson);
+            listaDisponibilidad.setAdapter(adapter);
+
+            /*ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout
+                    .simple_expandable_list_item_1, listado);
+            listaDisponibilidad.setAdapter(adapter);*/
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
 
     public void obtDatosJSON(String response) {
 
