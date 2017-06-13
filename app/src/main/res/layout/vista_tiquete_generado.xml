@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    android:layout_margin="20dp">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Libro solicitado: "
+        style="@style/encabezadoItem"/>
+
+    <TextView
+        android:id="@+id/tvLibroGenerado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Estudiante"
+        style="@style/encabezadoItem"/>
+
+    <TextView
+        android:id="@+id/tvCodigoEstudianteGenerado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_below="@+id/textView"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@drawable/style_menu_item"
+        android:elevation="20dp"
+        android:layout_margin="10dp">
+
+        <com.github.snowdream.android.widget.SmartImageView
+            android:id="@+id/imagenLista"
+            android:layout_height="100dp"
+            android:layout_width="100dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="16dp"
+            android:src="@mipmap/carnet"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvCodigoTiquete"
+            android:layout_toRightOf="@+id/imagenLista"
+            android:textSize="30sp"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:text="codigo tiquete"
+            android:textColor="@color/blanco"></TextView>
+
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnCerrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar"/>
+
+</LinearLayout>

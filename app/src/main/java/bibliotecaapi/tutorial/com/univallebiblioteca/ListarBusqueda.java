@@ -59,6 +59,7 @@ public class ListarBusqueda extends Activity {
     EditText etCorreoEstudiante;
     EditText etObservacion;
     Button btnCancelarTiquete;
+    Button btnCerrar;
 
 
     @Override
@@ -301,6 +302,7 @@ public class ListarBusqueda extends Activity {
                     disponibilidad.setEstado_codigo("RESERVADO");
                     progressDialog.dismiss();
                     adapter.notifyDataSetChanged();
+                    showTiqueteGenerado(new String(responseBody),disponibilidad);
                     //obtDatosJSONdisponiblidad(new String(responseBody));
                 }
             }
@@ -311,6 +313,28 @@ public class ListarBusqueda extends Activity {
             }
 
         });
+
+    }
+
+    public void showTiqueteGenerado(String responseBody, ItemLibroDisponibilidad
+            disponibilidad){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.vista_tiquete_generado);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.setTitle("Resultado tiquete");
+
+
+        btnCerrar = (Button) dialog.findViewById(R.id.btnCerrar);
+
+        btnCerrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
 
     }
 
