@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,13 @@ public class ListarBusqueda extends Activity {
     Integer pocisionlibro;
     CharSequence[] items = new CharSequence[0];
     DisponibilidadAdapter adapter;
+    Button btnGenerar;
+    EditText etCodigoEstudiante;
+    EditText etCorreoEstudiante;
+    EditText etObservacion;
+    Button btnCancelarTiquete;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,8 +224,7 @@ public class ListarBusqueda extends Activity {
                     /*intent = new Intent(Visita.this,CerrarVisita.class);
                     intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
                     startActivity(intent);*/
-                    grabarTiquete(disponibilidad);
-                    adapter.notifyDataSetChanged();
+                    showGenerarTiquete(disponibilidad);
                 }else
                 if(items[which].toString().equals("Solicitar")){
                     /*intent = new Intent(Visita.this,CancelarVisita.class);
@@ -233,9 +240,36 @@ public class ListarBusqueda extends Activity {
 
     }
 
-    public void showGenerarTiquete(ItemLibroDisponibilidad disponibilidad){
+    public void showGenerarTiquete(final ItemLibroDisponibilidad disponibilidad){
 
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.datos_generar_tiquete);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.setTitle("Generar tiquete");
 
+        btnGenerar = (Button) dialog.findViewById(R.id.btnGenerar);
+        etCodigoEstudiante = (EditText) dialog.findViewById(R.id.etCodigoEstudiante);
+        etCorreoEstudiante = (EditText) dialog.findViewById(R.id.etCorreoEstudiante);
+        etObservacion = (EditText) dialog.findViewById(R.id.etObservacion);
+        btnCancelarTiquete = (Button) dialog.findViewById(R.id.btnCancelarTiquete);
+
+        btnGenerar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grabarTiquete(disponibilidad);
+                adapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+
+        btnCancelarTiquete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
 
     }
 
@@ -251,8 +285,9 @@ public class ListarBusqueda extends Activity {
 
         RequestParams parametros = new RequestParams();
         parametros.put("itelibdis_codigo",disponibilidad.getItelibdis_codigo());
-        parametros.put("correoestudiante","correo@univalle.edu.co");
-        parametros.put("codigoestudiante","201463778-2711");
+        parametros.put("correoestudiante",etCorreoEstudiante.getText());
+        parametros.put("codigoestudiante",etCodigoEstudiante.getText());
+        parametros.put("observacionestudiante",etObservacion.getText());
         parametros.put("libro_codigo",disponibilidad.getLibro_codigo());
 
         client.post(url, parametros, new AsyncHttpResponseHandler() {
