@@ -4,14 +4,16 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
+import android.support.v7.app.AlertDialog;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -37,7 +39,7 @@ public class ListarBusqueda extends Activity {
     Intent intent;
     Button btnCancelar;
     Button btnDisponibilidad;
-    TextView tvLibroTitulo;
+    TextView librotitulodisponibilidad;
     ListView listaDisponibilidad;
 
     JSONObject jsonObject = new JSONObject();
@@ -45,6 +47,8 @@ public class ListarBusqueda extends Activity {
     TextView libroPublicacion;
     TextView descripcionFisica;
     TextView libroResumen;
+    Integer pocisionlibro;
+    CharSequence[] items = new CharSequence[0];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +62,6 @@ public class ListarBusqueda extends Activity {
         listaLibros = (ListView) findViewById(R.id.listaLibros);
         this.descargarImagen(textobusqueda);
         this.listViewClick();
-
 
     }
 
@@ -74,7 +77,7 @@ public class ListarBusqueda extends Activity {
                     e.printStackTrace();
                 }
                 startActivity(i);*/
-
+                pocisionlibro = position;
                 showInfoLibro(position);
             }
 
@@ -154,6 +157,9 @@ public class ListarBusqueda extends Activity {
 
         btnCancelar = (Button) dialog.findViewById(R.id.btnCancelar);
         listaDisponibilidad = (ListView) dialog.findViewById(R.id.listaDisponibilidad);
+        librotitulodisponibilidad = (TextView) dialog.findViewById(R.id.tvLibroTituloDis);
+        librotitulodisponibilidad.setText(listaObjLibrosJson.get(pocisionlibro).getLibro_titulo());
+        this.setOnClickListenerListViewDisponibilidad();
 
         cargaDatosDisponibilidad(libro_codigo);
 
@@ -167,6 +173,58 @@ public class ListarBusqueda extends Activity {
         dialog.show();
 
     };
+
+    public void setOnClickListenerListViewDisponibilidad(){
+
+        listaDisponibilidad.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ItemLibroDisponibilidad disponibilidad = listaObjDisponibilidadJson.get(position);
+                showDialogOpcionListaDisponibilidad(disponibilidad);
+            }
+        });
+
+    }
+
+    public void showDialogOpcionListaDisponibilidad(ItemLibroDisponibilidad disponibilidad){
+
+        String estadoTitle = "Opciones";
+        if(disponibilidad.getEstado_nombre().equals("DISPONIBLE")){
+            items = new CharSequence[]{"Generar tiquete"};
+            estadoTitle = "Reserva libro";
+        }else{
+            items = new CharSequence[]{"Solicitar"};
+            estadoTitle = "Libro no disponible, solicitalo";
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(estadoTitle);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Toast.makeText(getApplicationContext(), items[which], Toast.LENGTH_LONG).show();
+                Log.d("Opción:",""+items[which]);
+
+                Intent intent;
+
+                if(items[which].toString().equals("Cerrar visita")){
+                    /*intent = new Intent(Visita.this,CerrarVisita.class);
+                    intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
+                    startActivity(intent);*/
+                }else
+                if(items[which].toString().equals("Cancelar visita")){
+                    /*intent = new Intent(Visita.this,CancelarVisita.class);
+                    intent.putExtra("dataJsonObject", objectVisita.getDataJsonObject().toString());
+                    startActivity(intent);*/
+                }
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
 
     public void cargaDatosDisponibilidad(String libroCodigo){
 
