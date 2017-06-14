@@ -287,7 +287,7 @@ public class ListarBusqueda extends Activity {
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
 
-        progressDialog.setMessage("Generando tiquete");
+        progressDialog.setMessage("Generando solicitud");
         progressDialog.show();
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -299,7 +299,7 @@ public class ListarBusqueda extends Activity {
         parametros.put("correoestudiante",etCorreoEstudianteSolicitud.getText());
         parametros.put("codigoestudiante",etCodigoEstudianteSolicitud.getText());
         parametros.put("mensajeestudiante",etMensajeSolicitud.getText());
-        parametros.put("nombreestudiante",etNombreSolicitante);
+        parametros.put("nombreestudiante",etNombreSolicitante.getText());
 
         client.post(url, parametros, new AsyncHttpResponseHandler() {
             @Override
